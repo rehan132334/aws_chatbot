@@ -1,0 +1,23 @@
+
+models:
+  - type: main
+    engine: openai
+    model: google/gemma-4-26b-a4b-it:free
+    parameters:
+      base_url: https://openrouter.ai/api/v1
+      api_key: OPENROUTER_API_KEY
+
+  - type: content_safety
+    engine: openai
+    model: google/gemma-4-26b-a4b-it:free
+    parameters:
+      base_url: https://openrouter.ai/api/v1
+      api_key: OPENROUTER_API_KEY
+
+rails:
+  input:
+    flows:
+      - content safety check input $model=content_safety
+  output:
+    flows:
+      - content safety check output $model=content_safety
