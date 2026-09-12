@@ -10,24 +10,13 @@ import asyncio
 #initiating the model
 import os
 from openai import OpenAI
-from langchain_openai import ChatOpenAI
-
-# 1. Initialize OpenAI client pointing to OpenRouter
-model = ChatOpenAI(
-    base_url="https://openrouter.ai/api/v1",
-    api_key=os.getenv("OPENROUTER_API_KEY"),
-    model="google/gemma-4-26b-a4b-it:free",  # Or deepseek/deepseek-r1:free
+import litellm
+from langchain_groq import ChatGroq
+model = ChatGroq(
+    model="openai/gpt-oss-120b",
     temperature=0,
-    model_kwargs={
-        "extra_body": {
-            "reasoning": {
-                "enabled": True  # Enables extended thinking / CoT
-            }
-        }
-    }
+    api_key=os.getenv("GROQ_API_KEY"),
 )
-
-
 
 from typing import Literal  
 class RAGConfig(TypedDict):
@@ -46,19 +35,7 @@ class RAGConfig(TypedDict):
 
 from pydantic import BaseModel, Field
 #for pydantic testing output
-class TestRoute(BaseModel):
-    route: Literal["True", "False",] = Field(
-        description=(
-            "'True' if the code is correct. "
-            "'False' if the code has errors."
-        )
-    )
-    error_message: str = Field(
-        description=(
-            "If the code has errors, provide a brief error message or description. "
-            "If the code is correct, this field can be empty or 'None'."
-        )
-    )
+
 
 class ToolRoute(BaseModel):
     route: Literal["none", "docs", "iac"] = Field(

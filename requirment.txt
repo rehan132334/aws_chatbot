@@ -21,3 +21,4 @@ mcp<2.0.0
 pypdf 
 python-docx
 nemoguardrails
+litellm

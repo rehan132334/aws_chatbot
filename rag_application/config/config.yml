@@ -1,23 +1,19 @@
-
 models:
   - type: main
     engine: openai
-    model: google/gemma-4-26b-a4b-it:free
+    model: openai/gpt-oss-120b
+    api_key_env_var: GROQ_API_KEY
     parameters:
-      base_url: https://openrouter.ai/api/v1
-      api_key: OPENROUTER_API_KEY
+      base_url: https://api.groq.com/openai/v1
 
   - type: content_safety
     engine: openai
-    model: google/gemma-4-26b-a4b-it:free
+    model: openai/gpt-oss-120b
+    api_key_env_var: GROQ_API_KEY
     parameters:
-      base_url: https://openrouter.ai/api/v1
-      api_key: OPENROUTER_API_KEY
+      base_url: https://api.groq.com/openai/v1
 
 rails:
   input:
     flows:
       - content safety check input $model=content_safety
-  output:
-    flows:
-      - content safety check output $model=content_safety

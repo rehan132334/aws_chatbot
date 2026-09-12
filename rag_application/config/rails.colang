@@ -1,0 +1,8 @@
+define flow content safety check input $model=content_safety
+  $is_safe = execute content_safety_check_input(model=$model)
+  if not $is_safe
+    bot refuse to respond
+    stop
+
+define bot refuse to respond
+  "The Quetion You asked is not related to AWS. So, I cant answer the question."
