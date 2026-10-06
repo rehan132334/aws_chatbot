@@ -16,7 +16,18 @@ TEXT_EXTENSIONS = {
     'yaml', 'yml', 'toml', 'ini', 'cfg', 'conf',
     'sh', 'bash', 'env', 'js', 'ts', 'sql', 'xml', 'ipynb',
 }
+def extract_s3_file(s3_key: str):
+    from s3_service import download_file
 
+    file_bytes = download_file(s3_key)
+
+    filename = s3_key.rsplit("/", 1)[-1]
+
+    return {
+        "name": filename,
+        "content": extract_text(filename, file_bytes)
+    }
+    
 def extract_text(file_path: str, file_bytes: bytes):
     filename = file_path.strip().lower()
     # e.g. "Dockerfile" -> "dockerfile", ".gitignore" -> "gitignore"

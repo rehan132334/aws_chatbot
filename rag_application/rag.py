@@ -37,12 +37,24 @@ model_iac = model.bind_tools(iac_tools)
 
 graph = StateGraph(RAGConfig)
 
+def load_s3_files(state: RAGConfig):
+    from file_extractor import extract_s3_file
 
+    files = state.get("files", [])
 
+    extracted_files = []
 
+    for s3_key in files:
+        try:
+            extracted_files.append(
+                extract_s3_file(s3_key)
+            )
+        except Exception as e:
+            print(f"[S3 File Error] {s3_key}: {e}")
 
-
-
+    return {
+        "files": extracted_files
+    }
 
 def _invoke_classifier(prompt):
     result = model.invoke(prompt, max_tokens=200)
@@ -130,8 +142,10 @@ def guard_input(state: RAGConfig):
     }
 
 
-def route_after_guard(state: RAGConfig):
-    return END if state.get("blocked") else "Prompt_agent"
+def route_after_guard(state):
+    if state["blocked"]:
+        return END
+    return "Load_S3_Files"
 
 
 def aws_agent(state: RAGConfig):
@@ -222,19 +236,23 @@ def guard_output(state: RAGConfig):
 
 
 graph.add_node("Guard_input", guard_input)
+graph.add_node("Load_S3_Files", load_s3_files)
 graph.add_node("Prompt_agent", run_prompt_agent)
 graph.add_node("Aws_agent", aws_agent)
 graph.add_node("Guard_output", guard_output)
 
 graph.add_edge(START, "Guard_input")
+
 graph.add_conditional_edges(
     "Guard_input",
     route_after_guard,
     {
-        "Prompt_agent": "Prompt_agent",
+        "Load_S3_Files": "Load_S3_Files",
         END: END,
     },
 )
+
+graph.add_edge("Load_S3_Files", "Prompt_agent")
 graph.add_edge("Prompt_agent", "Aws_agent")
 graph.add_edge("Aws_agent", "Guard_output")
 graph.add_edge("Guard_output", END)

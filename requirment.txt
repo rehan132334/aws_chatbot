@@ -22,3 +22,4 @@ pypdf
 python-docx
 nemoguardrails
 litellm
+boto3
